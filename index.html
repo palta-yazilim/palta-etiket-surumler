@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Palta Etiket — İndir</title>
+<meta name="description" content="Palta Etiket kurulum dosyasını indirin.">
+<style>
+  :root{
+    --zemin:#f6f7f9; --kart:#fff; --yazi:#16202c; --yazi2:#5b6875;
+    --cizgi:#e3e7ec; --vurgu:#1f6feb; --vurgu-koyu:#1a5fd0;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --zemin:#0f1419; --kart:#171d24; --yazi:#e8ecf1; --yazi2:#9aa7b4;
+           --cizgi:#242d36; --vurgu:#4d8ef7; --vurgu-koyu:#3b7ae0; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;
+       background:var(--zemin);color:var(--yazi);
+       font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .kart{width:100%;max-width:560px;background:var(--kart);border:1px solid var(--cizgi);
+        border-radius:14px;padding:36px 32px;text-align:center}
+  .logo{width:64px;height:64px;border-radius:15px;margin:0 auto 18px;display:block}
+  h1{margin:0 0 4px;font-size:27px;letter-spacing:-.02em}
+  .alt{margin:0 0 22px;color:var(--yazi2);font-size:15px}
+  .surum{display:inline-block;margin-bottom:26px;padding:4px 12px;border-radius:999px;
+         background:var(--zemin);border:1px solid var(--cizgi);
+         font-size:13px;color:var(--yazi2);font-variant-numeric:tabular-nums}
+  .dgm{display:block;width:100%;padding:15px 20px;border-radius:9px;border:0;
+       background:var(--vurgu);color:#fff;font-size:16.5px;font-weight:600;
+       text-decoration:none;cursor:pointer;transition:background .15s}
+  .dgm:hover{background:var(--vurgu-koyu)}
+  .dgm[aria-disabled="true"]{opacity:.55;pointer-events:none}
+  .ikincil{display:inline-block;margin-top:14px;color:var(--vurgu);
+           text-decoration:none;font-size:14.5px}
+  .ikincil:hover{text-decoration:underline}
+  .notlar{margin:26px 0 0;padding-top:20px;border-top:1px solid var(--cizgi);
+          text-align:left;color:var(--yazi2);font-size:13.5px}
+  .notlar p{margin:0 0 10px}
+  .notlar p:last-child{margin:0}
+  .notlar b{color:var(--yazi);font-weight:600}
+</style>
+</head>
+<body>
+<main class="kart">
+  <svg class="logo" viewBox="0 0 512 512" aria-hidden="true">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b7cff"/><stop offset="1" stop-color="#1650b8"/></linearGradient></defs>
+    <rect width="512" height="512" rx="112" fill="url(#g)"/>
+    <rect x="96" y="128" width="320" height="64" rx="16" fill="#fff"/>
+    <rect x="96" y="224" width="224" height="64" rx="16" fill="#fff"/>
+    <rect x="96" y="320" width="320" height="64" rx="16" fill="#fff"/>
+    <circle cx="384" cy="256" r="40" fill="#ffd54a"/>
+  </svg>
+
+  <h1>Palta Etiket</h1>
+  <p class="alt">Termal etiket tasarım ve yazdırma programı</p>
+  <div class="surum" id="surum">Sürüm bilgisi alınıyor…</div>
+
+  <a class="dgm" id="kurulum" href="https://github.com/palta-yazilim/palta-etiket-surumler/releases/latest" aria-disabled="true">
+    Windows için indir
+  </a>
+  <a class="ikincil" id="tasinabilir" href="https://github.com/palta-yazilim/palta-etiket-surumler/releases/latest" hidden>
+    Kurulum yapmadan çalıştır (taşınabilir sürüm)
+  </a>
+
+  <div class="notlar">
+    <p><b>Kurulum:</b> İndirdiğiniz dosyayı çift tıklayın. Windows “Tanınmayan uygulama”
+       uyarısı verirse <b>Daha fazla bilgi → Yine de çalıştır</b> deyin.</p>
+    <p><b>Güncelleme:</b> Program yeni sürümleri kendisi bulur ve sizin onayınızla kurar.
+       Bu sayfaya yalnızca ilk kurulum için gelmeniz yeter.</p>
+    <p><b>Gereksinim:</b> Windows 10 veya üzeri, 64 bit.</p>
+  </div>
+</main>
+
+<script>
+// Sürüm bilgisi ve indirme bağlantıları en son yayından okunur; böylece bu
+// sayfanın her sürümde elle güncellenmesi gerekmez.
+const DEPO = 'palta-yazilim/palta-etiket-surumler';
+const bicimle = (b) => (b / 1048576).toFixed(0) + ' MB';
+
+fetch(`https://api.github.com/repos/${DEPO}/releases/latest`)
+  .then((y) => (y.ok ? y.json() : Promise.reject(new Error(y.status))))
+  .then((s) => {
+    const exe = (s.assets || []).filter((a) => a.name.toLowerCase().endsWith('.exe'));
+    const kurulum = exe.find((a) => /kurulum/i.test(a.name));
+    const tasinabilir = exe.find((a) => /tasinabilir/i.test(a.name));
+    const tarih = new Date(s.published_at).toLocaleDateString('tr-TR',
+      { day: 'numeric', month: 'long', year: 'numeric' });
+
+    document.getElementById('surum').textContent =
+      `${s.tag_name.replace(/^v/, 'Sürüm ')} · ${tarih}`;
+
+    if (kurulum) {
+      const d = document.getElementById('kurulum');
+      d.href = kurulum.browser_download_url;
+      d.textContent = `Windows için indir (${bicimle(kurulum.size)})`;
+      d.removeAttribute('aria-disabled');
+    }
+    if (tasinabilir) {
+      const t = document.getElementById('tasinabilir');
+      t.href = tasinabilir.browser_download_url;
+      t.hidden = false;
+    }
+  })
+  .catch(() => {
+    // Ağ ya da API sorunu: düğme sürümler sayfasına gitsin, kimse boş kalmasın.
+    document.getElementById('surum').textContent = 'Sürüm bilgisi alınamadı';
+    const d = document.getElementById('kurulum');
+    d.textContent = 'İndirme sayfasını aç';
+    d.removeAttribute('aria-disabled');
+  });
+</script>
+</body>
+</html>
